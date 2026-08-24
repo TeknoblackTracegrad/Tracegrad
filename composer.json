@@ -1,0 +1,8 @@
+{
+  "name": "tracegrad/tracegrad-v2",
+  "description": "TRACEGRAD local dependencies",
+  "type": "project",
+  "require": {
+    "phpmailer/phpmailer": "^6.9"
+  }
+}

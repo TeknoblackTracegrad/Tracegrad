@@ -1,0 +1,31 @@
+TRACEGRAD BULK GALLERY - XAMPP PHP SETTINGS
+============================================
+
+Because PHP limits the number and total size of uploaded files, bulk/folder
+uploads may need these settings.
+
+Open the XAMPP Control Panel.
+Beside Apache click Config > PHP (php.ini).
+
+Find these settings and use values similar to:
+
+upload_max_filesize = 10M
+post_max_size = 256M
+max_file_uploads = 100
+max_execution_time = 300
+max_input_time = 300
+memory_limit = 256M
+
+IMPORTANT:
+- upload_max_filesize is PER FILE.
+- post_max_size is the TOTAL HTTP upload request.
+- max_file_uploads controls how many files PHP accepts in one request.
+- After changing php.ini, SAVE it and RESTART APACHE.
+
+TRACEGRAD's application-level limits in gallery-upload-handler.php are:
+- Max 100 files per request.
+- Max 10 MB per file.
+- Max approximately 250 MB combined.
+
+For ordinary use, smaller batches such as 20-50 photos at a time are more
+reliable on local XAMPP.

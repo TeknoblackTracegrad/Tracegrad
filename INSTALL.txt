@@ -1,0 +1,181 @@
+TRACEGRAD - BULK / FOLDER GALLERY UPLOAD
+===========================================
+
+WHAT THIS ADDS
+--------------
+1. Select multiple photos in one upload.
+2. Select an entire folder using Chrome/Edge.
+3. Preview selected images before upload.
+4. Shows file count and total size.
+5. Secure server-side MIME validation.
+6. 10 MB maximum per image.
+7. 100 images maximum per request.
+8. Approximately 250 MB combined request limit.
+9. Invalid/unsupported files are skipped and reported.
+10. All selected images go to the chosen Gallery album.
+11. Optional title prefix automatically creates numbered titles.
+
+IMPORTANT
+---------
+This upgrade intentionally DOES NOT preserve nested folders inside the album.
+If you choose a folder, its supported photos are uploaded into the selected
+TRACEGRAD album.
+
+If later you want:
+Album > Folder/Bundle > Photos
+we can add a bundle_name database field and filter.
+
+FILES
+-----
+
+A) REPLACE:
+includes/dept-admin-dashboard/views/gallery.php
+
+with:
+includes/dept-admin-dashboard/views/gallery.php
+from this package.
+
+B) REPLACE:
+assets/css/dept-admin-dashboard.css
+
+with:
+assets/css/dept-admin-dashboard.css
+from this package.
+
+C) CREATE:
+assets/js/dept-admin-gallery-upload.js
+
+D) CREATE:
+includes/dept-admin-dashboard/gallery-upload-handler.php
+
+E) EDIT:
+includes/dept-admin-dashboard/modals.php
+
+Find the old block that starts with:
+
+<!-- Upload Image -->
+<div id="form-upload-image"
+
+Remove that ENTIRE upload-image block only.
+
+Paste the contents of:
+
+snippets/replace-upload-modal.php
+
+in the same location.
+
+DO NOT remove the Add Album modal or any other modal.
+
+F) EDIT:
+includes/dept-admin-dashboard/post-handler.php
+
+Find:
+
+case 'image_upload': {
+
+Remove the COMPLETE old image_upload case, through its matching:
+
+break;
+}
+
+Then paste:
+
+case 'image_upload': {
+    require __DIR__ . '/gallery-upload-handler.php';
+    break;
+}
+
+A ready snippet is in:
+
+snippets/replace-image-upload-case.txt
+
+WHY THE HANDLER IS SEPARATED
+----------------------------
+This avoids replacing your entire post-handler.php and accidentally undoing
+the CSV fixes, SMTP work, or other Department Admin actions.
+
+FINAL STRUCTURE
+---------------
+
+Tracegrad v2/
+|
+|-- assets/
+|   |-- css/
+|   |   `-- dept-admin-dashboard.css
+|   |
+|   `-- js/
+|       `-- dept-admin-gallery-upload.js
+|
+`-- includes/
+    `-- dept-admin-dashboard/
+        |-- gallery-upload-handler.php
+        |-- post-handler.php
+        |-- modals.php
+        |
+        `-- views/
+            `-- gallery.php
+
+XAMPP / PHP SETTINGS
+--------------------
+Read XAMPP-PHP-SETTINGS.txt.
+
+For folder/bulk uploads, the important php.ini setting is:
+
+max_file_uploads = 100
+
+The default PHP value is often much lower.
+
+After changing php.ini:
+RESTART APACHE.
+
+HOW TO TEST
+-----------
+TEST 1 - 3 photos
+1. Department Admin > Gallery.
+2. Click Upload Photos.
+3. Select Photos.
+4. Choose 3 JPG photos.
+5. Pick an Album.
+6. Leave Title Prefix blank.
+7. Click Upload Selected Photos.
+8. Confirm all 3 appear.
+
+TEST 2 - title prefix
+1. Select 5 photos.
+2. Title Prefix:
+   Graduation 2026
+3. Upload.
+4. Titles should become similar to:
+   Graduation 2026 01
+   Graduation 2026 02
+   ...
+
+TEST 3 - folder
+1. Create a folder on Windows containing JPG/PNG photos.
+2. Gallery > Upload Photos.
+3. Select Folder.
+4. Choose that folder.
+5. TRACEGRAD should show the selected folder name, file count, size, and previews.
+6. Pick an album.
+7. Upload.
+
+TEST 4 - invalid file
+Put a TXT/PDF inside a selected folder.
+The browser should normally filter it out.
+The backend also checks the actual MIME type and will not save unsupported
+files as gallery images.
+
+BROWSER SUPPORT
+---------------
+Folder selection uses the webkitdirectory browser feature.
+Use current Google Chrome or Microsoft Edge on your Windows/XAMPP PC.
+
+SECURITY
+--------
+The backend:
+- checks that the selected album belongs to/works for the Department Admin;
+- validates actual file MIME using PHP Fileinfo;
+- creates random server filenames;
+- does not trust the original extension;
+- prevents files over the configured limits;
+- uses prepared statements for gallery database inserts.
