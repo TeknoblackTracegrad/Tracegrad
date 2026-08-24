@@ -1,0 +1,5 @@
+# TRACEGRAD local secrets
+/config/mail.php
+
+# Composer dependencies
+/vendor/
